@@ -57,17 +57,17 @@ class Storage:
                     insert_items["metadatas"].append(data['metadatas'][i])
                     insert_items["embeddings"].append(data['embeddings'][i])
                 else:
-                    insert_items["ids"].append(item)
-                    insert_items["documents"].append(data['documents'][i])
-                    insert_items["metadatas"].append(data['metadatas'][i])
-                    insert_items["embeddings"].append(data['embeddings'][i])
+                    update_items["ids"].append(item)
+                    update_items["documents"].append(data['documents'][i])
+                    update_items["metadatas"].append(data['metadatas'][i])
+                    update_items["embeddings"].append(data['embeddings'][i])
 
                 if len(insert_items['ids']) > 0:
                     self._collection.add(**insert_items)
                 
                 if len(update_items['ids']) > 0:
                     self._collection.update(**update_items)
-                    
+
         except Exception as e:
             print(f"Error adding embeddings to collection: {e}")
 
