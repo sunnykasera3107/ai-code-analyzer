@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Review Repository {{repo_name}}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-4">
+            <a href="/" class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">< Back to dashboard</a>
+        </div>
+        <div class="col-4">
+        </div>
+        <div class="col-4">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Git repository URL" aria-describedby="button-addon2" name="repo_url" />
+                <button name="analyze" class="btn btn-primary" id="button-addon2">Analyze</button>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="container mt-5">
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+            <a href="/">Back</a>
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title mb-3">Review: {{repo_name}}
+                    <form method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="repo_url" value="{{ repo_url }}" />
+                        <button name="pull_repo" type="submit" class="btn btn-link">Pull Again</button>
+                    </form>
+                </h1>
+                <p><a href="{{repo_url}}" class="link-success link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" target="_blank">{{repo_url}}</a></p>
+                
+                {% if backend %}
+                <div class="mb-0">
+                    <span class="">Backend: </span>
+                    {% for item in backend %}
+                        <span class="badge rounded-pill bg-primary mb-2">{{item}}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if frontend|length > 0 %}
+                <div class="mb-0">
+                    <span class="">Frontend: </span>
+                    {% for item in frontend %}
+                        <span class="badge rounded-pill bg-info mb-2">{{item}}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if dependencies|length > 0 %}
+                <div class="mb-0">
+                    <span class="">Dependencies: </span>
+                    {% for item in dependencies %}
+                        <span class="badge rounded-pill bg-success mb-2">{{item}}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if database|length > 0 %}
+                <div class="mb-0">
+                    <span class="">Database: </span>
+                    {% for item in database %}
+                        <span class="badge rounded-pill text-dark bg-warning mb-2">{{item}}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if report_items %}
+                <div class="my-4">
+                    <form method="POST">
+                        <div class="input-group mb-3">
+                            {% csrf_token %}
+                            <input type="text" class="form-control" placeholder="Search file, code, module" name="query"/>
+                            <button name="search" class="btn btn-primary" id="button-addon2">Search</button>
+                        </div>
+                    </form>
+                </div>
+                {% if method_list %}
+                    <table class="table table-hover table-issues">
+                        <thead class="table-light">
+                            <tr>
+                                <th>File/Function</th>
+                                <th>Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in method_list %}
+                            <tr>
+                                <td>{{item.id}}</td>
+                                <td><code>{{item.code}}</code></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif%}
+                                
+                <table class="table table-hover table-issues">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Message</th>
+                            <th>File Path</th>
+                            <th>Line Number</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in report_items %}
+                        <tr class="bg-{{ item.type|lower }}">
+                            <td>{{item.message}}</td>
+                            <td>{{item.path}}</td>
+                            <td>{{item.line}}</td>
+                            <td><span class="badge bg-warning text-dark">{{item.category}}</span></td>
+                            <td><span class="badge bg-success">{{item.severity}}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

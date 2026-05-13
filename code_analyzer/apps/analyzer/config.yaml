@@ -1,0 +1,13 @@
+skips:
+  - .git
+  - .venv
+  - venv
+  - .gitignore
+  - .dockerignore
+  - dist
+  - build
+
+language:
+  py: python
+  js: javascript
+  php: php

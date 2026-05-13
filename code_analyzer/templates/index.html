@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Dashboard</h2>
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-4">
+        </div>
+        <div class="col-4">
+        </div>
+        <div class="col-4">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Git repository URL" aria-describedby="button-addon2" name="repo_url" />
+                <button name="analyze" class="btn btn-primary" id="button-addon2">Analyze</button>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="row">
+    {% if items %}
+        <table class="table table-light table-striped">
+            <tr>
+                <th>Repository</th>
+                <th>Repository URL</th>
+                <th>Link to gmail</th>
+            </tr>
+            {% for item in items %}
+                <tr>
+                    <td>{{ item.repo_name }}</td>
+                    <td>{{ item.repo_url }}</td>
+                    <td>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="repo_url" value="{{ item.repo_url }}" />
+                            <button type="submit" class="btn btn-outline-primary">Pull Again</button>
+                            <a href="repository-review/{{item.repo_name}}" class="btn btn-outline-success">Review</a>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>
+            No item found
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

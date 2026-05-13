@@ -1,0 +1,17 @@
+django
+gitpython
+PyYAML
+tree-sitter
+tree-sitter-python
+tree-sitter-javascript
+tree-sitter-php
+# tree-sitter-language-pack
+sentence-transformers
+chromadb
+langchain
+langgraph
+langchain-ollama
+IPython
+groq
+langchain-groq
+semgrep
