@@ -1,5 +1,6 @@
 import os
 import chromadb
+import hashlib
 
 class Storage:
     '''Stores vector data in chromadb
@@ -33,7 +34,40 @@ class Storage:
             return
         
         try:
-            self._collection.add(**data)
+            insert_items = {
+                "ids": [],
+                "documents": [],
+                "embeddings": [],
+                "metadatas": []
+            }
+            update_items = {
+                "ids": [],
+                "documents": [],
+                "embeddings": [],
+                "metadatas": []
+            }
+            for i, item in enumerate(data['ids']):
+                item_hash = self.generate_hash(data['documents'][i])
+                existing_doc = self.get_doc([item])
+                existing_hash = existing_doc['metadatas']['0']['hash']
+                data['metadatas'][i]['hash'] = item_hash
+                if item_hash != existing_hash:
+                    insert_items["ids"].append(item)
+                    insert_items["documents"].append(data['documents'][i])
+                    insert_items["metadatas"].append(data['metadatas'][i])
+                    insert_items["embeddings"].append(data['embeddings'][i])
+                else:
+                    insert_items["ids"].append(item)
+                    insert_items["documents"].append(data['documents'][i])
+                    insert_items["metadatas"].append(data['metadatas'][i])
+                    insert_items["embeddings"].append(data['embeddings'][i])
+
+                if len(insert_items['ids']) > 0:
+                    self._collection.add(**insert_items)
+                
+                if len(update_items['ids']) > 0:
+                    self._collection.update(**update_items)
+                    
         except Exception as e:
             print(f"Error adding embeddings to collection: {e}")
 
@@ -42,3 +76,14 @@ class Storage:
             query_embeddings=query['embedding'],
             n_results=query['number_of_results']
         )
+    
+    def get_doc(self, id: list):
+        return self._collection.get(
+            ids=id,
+            include=["metadatas"]
+        )
+    
+    def generate_hash(content: str):
+        return hashlib.sha256(
+            content.encode("utf-8")
+        ).hexdigest()
